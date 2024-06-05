@@ -13,7 +13,7 @@ To install the `VirtualizedList` component, you can use npm or yarn:
 ```bash
 npm install virtualized-list
 
-
+```markdown
 
 ## Data Structure
 
