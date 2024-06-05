@@ -11,7 +11,7 @@ The `VirtualizedList` component is designed to handle large datasets by only ren
 To install the `VirtualizedList` component, you can use npm or yarn:
 
 ```bash
-npm install virtualized-list```
+npm install virtualized-list
 
 
 
