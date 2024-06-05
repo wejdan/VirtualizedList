@@ -1,70 +1,82 @@
-# Getting Started with Create React App
+# VirtualizedList
 
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+A React component for rendering large lists efficiently using virtualized rendering and lazy loading.
 
-## Available Scripts
+## Purpose
 
-In the project directory, you can run:
+The `VirtualizedList` component is designed to handle large datasets by only rendering the visible items in the viewport. It also supports lazy loading of items when scrolling, both in forward and reverse directions.
 
-### `npm start`
+## Installation
 
-Runs the app in the development mode.\
-Open [http://localhost:3000](http://localhost:3000) to view it in your browser.
+To install the `VirtualizedList` component, you can use npm or yarn:
 
-The page will reload when you make changes.\
-You may also see any lint errors in the console.
+```bash
+npm install virtualized-list
 
-### `npm test`
+```
 
-Launches the test runner in the interactive watch mode.\
-See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
+## Data Structure
 
-### `npm run build`
+The items passed to the `VirtualizedList` component must be a linked list where each item points to the next and previous item. Additionally, if `showNewItemsCount` is `true`, each item must have a `timestamp` property.
 
-Builds the app for production to the `build` folder.\
-It correctly bundles React in production mode and optimizes the build for the best performance.
+## Props
 
-The build is minified and the filenames include the hashes.\
-Your app is ready to be deployed!
+- **initialItems**: An array of initial items to be displayed.
+- **loadMore**: A function to fetch more items when the user scrolls near the end of the list.
+- **inverse**: (optional) A boolean to enable reverse scrolling (default: `false`).
+- **buffer**: (optional) Number of items to render before and after the visible range (default: `0`).
+- **renderItem**: A function to render each item.
+- **getItemSize**: A function to get the size (height) of each item.
+- **loader**: A React node to display while loading more items.
+- **uniqueKey**: A string key to uniquely identify each item.
+- **totalCount**: The total number of items.
+- **startAtItem**: (optional) The unique key of the item to start at.
+- **showNewItemsCount**: (optional) A boolean to show the count of new items (default: `true`).
+- **renderNewItemsIndicator**: (optional) A function to render a custom new items indicator.
+- **getPrevId**: A function to get the previous item ID.
+- **getNextId**: A function to get the next item ID.
 
-See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
+## Example
 
-### `npm run eject`
+```javascript
+import React from "react";
+import VirtualizedList from "virtualized-list";
 
-**Note: this is a one-way operation. Once you `eject`, you can't go back!**
+const initialItems = [
+  // Initialize with some items if needed
+];
 
-If you aren't satisfied with the build tool and configuration choices, you can `eject` at any time. This command will remove the single build dependency from your project.
+const loadMoreItems = (direction, itemId) => {
+  return new Promise((resolve) => {
+    setTimeout(() => {
+      const newItems = Array.from({ length: 20 }, (_, index) => ({
+        id: `${direction}-${itemId}-${index}`,
+        content: `New Item ${direction}-${itemId}-${index}`,
+        timestamp: Date.now() - index * 1000,
+        prevId: index > 0 ? `${direction}-${itemId}-${index - 1}` : itemId,
+        nextId: index < 19 ? `${direction}-${itemId}-${index + 1}` : null,
+      }));
+      resolve({
+        hasMore: true,
+        items: newItems,
+      });
+    }, 1000); // Simulate network delay of 1 second
+  });
+};
 
-Instead, it will copy all the configuration files and the transitive dependencies (webpack, Babel, ESLint, etc) right into your project so you have full control over them. All of the commands except `eject` will still work, but they will point to the copied scripts so you can tweak them. At this point you're on your own.
+const App = () => (
+  <VirtualizedList
+    initialItems={initialItems}
+    loadMore={loadMoreItems}
+    renderItem={(item) => <div>{item.content}</div>}
+    getItemSize={(item) => 50} // Example fixed height
+    loader={<div>Loading...</div>}
+    uniqueKey="id"
+    totalCount={1000}
+    getPrevId={(item) => item.prevId}
+    getNextId={(item) => item.nextId}
+  />
+);
 
-You don't have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn't feel obligated to use this feature. However we understand that this tool wouldn't be useful if you couldn't customize it when you are ready for it.
-
-## Learn More
-
-You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
-
-To learn React, check out the [React documentation](https://reactjs.org/).
-
-### Code Splitting
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/code-splitting](https://facebook.github.io/create-react-app/docs/code-splitting)
-
-### Analyzing the Bundle Size
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size](https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size)
-
-### Making a Progressive Web App
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app](https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app)
-
-### Advanced Configuration
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/advanced-configuration](https://facebook.github.io/create-react-app/docs/advanced-configuration)
-
-### Deployment
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/deployment](https://facebook.github.io/create-react-app/docs/deployment)
-
-### `npm run build` fails to minify
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify](https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify)
+export default App;
+```
