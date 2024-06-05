@@ -12,6 +12,9 @@ To install the `VirtualizedList` component, you can use npm or yarn:
 
 ```bash
 npm install virtualized-list```
+
+
+
 ## Data Structure
 
 The items passed to the `VirtualizedList` component must be a linked list where each item points to the next and previous item. Additionally, if `showNewItemsCount` is `true`, each item must have a `timestamp` property.
